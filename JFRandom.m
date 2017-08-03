@@ -1,5 +1,6 @@
 //
 // JFRandom.m
+// JFCommon
 //
 // Created by Jason Fuerstenberg on 10/04/26.
 // Copyright 2010 Jason Fuerstenberg
@@ -51,7 +52,6 @@
 	*receiver = (arc4random() % ((high + 1) - low)) + low;
 	return YES;
 }
-
 
 /*
  * Generates an optionally unique sequence of random numbers between low and high and places them into the sequence.
@@ -127,7 +127,6 @@
 	return YES;
 }
 
-
 /*
  * Randomly chooses a number from the provided sequence and places it into the receiver.
  *
@@ -169,7 +168,6 @@
 	return YES;
 }
 
-
 /*
  * Returns YES if the provided number appears within the sequence.
  *
@@ -204,7 +202,6 @@
 	// The number was not found.
 	return NO;
 }
-
 
 /*
  * Returns an NSData populated with bytes whose values range from 0 to 255.
@@ -242,7 +239,6 @@
 	return data;
 }
 
-
 /*
  * Returns an NSData populated with bytes whose values range from -128 to 127.
  *
@@ -279,7 +275,6 @@
 	return data;
 }
 
-
 /*
  *
  * Returns a string populated with random characters.
@@ -315,6 +310,88 @@
 	free(randData);
 	
 	return string;
+}
+
+/*
+ *
+ * Returns a string populated with random characters.
+ *
+ * Params
+ *		length		The length of the resulting string.
+ *					Must be 1 or greater or nil will be returned.
+ *      characters  The valid ASCII characters to include in the output.
+ *
+ * Returns
+ *		An ASCII encoded NSString instance.
+ */
++ (NSString *) generateRandomStringOfLength: (NSUInteger) length withOnlyCharacters: (NSString *) characters {
+	
+	if (length == 0) {
+		return nil;
+	}
+    
+    NSUInteger charactersLength = [characters length];
+    if (charactersLength == 0) {
+        return [JFRandom generateRandomStringOfLength: length];
+    }
+    
+    
+	
+	NSInteger *sequence = malloc(sizeof(NSInteger) * length);
+	[JFRandom generateNumberSequenceOfLength: length
+										into: sequence
+								  betweenLow: 0
+									 andHigh: charactersLength - 1
+						withOnlyUniqueValues: NO];
+	
+    const char *cc = [characters cStringUsingEncoding: NSASCIIStringEncoding];
+	char *randData = malloc(length + 1);
+	for (NSUInteger loop = 0; loop < length; loop++) {
+        NSUInteger s = sequence[loop];
+		randData[loop] = cc[s];
+	}
+    randData[length] = 0;
+	
+	free(sequence);
+	NSString *string = [NSString stringWithCString: randData
+										  encoding: NSASCIIStringEncoding];
+	free(randData);
+	
+	return string;
+}
+
+/*
+ * Returns a random date between daysAgo and daysFromNow relative to today.
+ *
+ * Params
+ *      daysAgo
+ *      daysFromNow   
+ *
+ * Returns
+ *      NSDate within the range
+ */
++ (NSDate *) generateRandomDateBetweenDaysAgo: (NSInteger) daysAgo andDaysFromNow: (NSInteger) daysFromNow {
+    
+    NSInteger range = daysFromNow + daysAgo;
+    
+    NSDateComponents *startDay = [[[NSDateComponents alloc] init] autorelease];
+    startDay.day = -daysAgo;
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    
+    NSDate *date = [NSDate date];
+    date = [calendar dateByAddingComponents: startDay
+                                     toDate: date
+                                    options: 0];
+    
+    NSDateComponents *offsetDays = [[[NSDateComponents alloc] init] autorelease];
+    offsetDays.day = arc4random() % range;
+    
+    date = [calendar dateByAddingComponents: offsetDays
+                                     toDate: date
+                                    options: 0];
+    
+    return date;
 }
 
 @end

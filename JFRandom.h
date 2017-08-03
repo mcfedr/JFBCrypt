@@ -1,5 +1,6 @@
 //
 // JFRandom.h
+// JFCommon
 //
 // Created by Jason Fuerstenberg on 10/05/03.
 // Copyright 2010 Jason Fuerstenberg
@@ -35,5 +36,8 @@
 + (NSData *) generateRandomSignedDataOfLength: (NSUInteger) length;
 + (NSData *) generateRandomDataOfLength: (NSUInteger) length;
 + (NSString *) generateRandomStringOfLength: (NSUInteger) length;
++ (NSString *) generateRandomStringOfLength: (NSUInteger) length withOnlyCharacters: (NSString *) characters;
+
++ (NSDate *) generateRandomDateBetweenDaysAgo: (NSInteger)daysAgo andDaysFromNow: (NSInteger)daysFromNow;
 
 @end
